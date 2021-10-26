@@ -6,7 +6,7 @@ import json
 import os
 import time
 from collections import namedtuple
-from datetime import datetime, date, timezone
+from datetime import datetime, timezone
 from importlib import import_module
 
 import aiohttp_jinja2
@@ -75,8 +75,9 @@ class AppService(AppServiceInterface, BaseService):
         while True:
             interval = 60
             for s in await self.get_service('data_svc').locate('schedules'):
-                now = datetime.now().time()
-                diff = datetime.combine(date.today(), now) - datetime.combine(date.today(), s.schedule)
+                now = datetime.now(timezone.utc).time()
+                today_utc = datetime.now(timezone.utc).date()
+                diff = datetime.combine(today_utc, now) - datetime.combine(today_utc, s.schedule)
                 if interval > diff.total_seconds() > 0:
                     self.log.debug('Pulling %s off the scheduler' % s.name)
                     sop = copy.deepcopy(s.task)

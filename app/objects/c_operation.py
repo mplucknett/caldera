@@ -145,7 +145,7 @@ class Operation(FirstClassObjectInterface, BaseObject):
 
     def set_start_details(self):
         self.id = self.id if self.id else str(uuid.uuid4())
-        self.start = datetime.now()
+        self.start = datetime.now(timezone.utc)
 
     def add_link(self, link):
         self.chain.append(link)
@@ -246,7 +246,7 @@ class Operation(FirstClassObjectInterface, BaseObject):
     async def active_agents(self):
         active = []
         for agent in self.agents:
-            if agent.last_seen > self.start.astimezone(timezone.utc):
+            if agent.last_seen > self.start:
                 active.append(agent)
         return active
 
@@ -505,7 +505,7 @@ class Operation(FirstClassObjectInterface, BaseObject):
                         privilege=agent.privilege,
                         host=agent.host,
                         contact=agent.contact,
-                        created=agent.created.astimezone().strftime(BaseObject.TIME_FORMAT))
+                        created=agent.created.strftime(BaseObject.TIME_FORMAT))
 
     class Reason(Enum):
         PLATFORM = 0
